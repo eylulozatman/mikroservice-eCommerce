@@ -1,0 +1,116 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Header from '../components/Header'
+import { useBasket } from '../context/BasketContext'
+import { useAuth } from '../context/AuthContext'
+import { orderApi } from '../api/api'
+
+export default function Basket() {
+  const { items, loading, fetchBasket, removeItem, clearBasket } = useBasket()
+  const { userId } = useAuth()
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    fetchBasket()
+  }, [])
+
+  const handleRemove = async (productId) => {
+    await removeItem(productId)
+  }
+
+  const handleCheckout = async () => {
+    if (items.length === 0) return
+    setCheckoutLoading(true)
+    
+    const data = await orderApi.checkout(userId).catch(err => {
+      alert(err.message)
+      return null
+    })
+    
+    if (data?.success) {
+      clearBasket()
+      alert('Order placed successfully! Order ID: ' + data.orderId)
+      navigate('/')
+    }
+    setCheckoutLoading(false)
+  }
+
+  const total = items.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
+
+  return (
+    <div className="flex flex-col min-h-screen bg-[#112117]">
+      <Header />
+      
+      <main className="flex-grow w-full max-w-[1440px] mx-auto px-4 md:px-10 py-8">
+        <h1 className="text-4xl font-black tracking-tighter text-white mb-8">Your Basket</h1>
+
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <span className="material-symbols-outlined text-4xl text-[#36e27b] animate-spin">
+              progress_activity
+            </span>
+          </div>
+        ) : items.length === 0 ? (
+          <div className="text-center py-20">
+            <span className="material-symbols-outlined text-6xl text-[#29382f] mb-4">shopping_cart</span>
+            <p className="text-[#9eb7a8] text-lg">Your basket is empty</p>
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex-1 space-y-4">
+              {items.map(item => (
+                <div key={item.productId} className="bg-[#1c2620] rounded-xl p-4 flex gap-4">
+                  <img
+                    src={item.product?.image}
+                    alt={item.product?.title}
+                    className="w-24 h-24 object-cover rounded-lg"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-white font-bold">{item.product?.title}</h3>
+                    <p className="text-[#9eb7a8] text-sm">Qty: {item.quantity}</p>
+                    <p className="text-[#36e27b] font-bold mt-1">${item.product?.price}</p>
+                  </div>
+                  <button
+                    onClick={() => handleRemove(item.productId)}
+                    className="text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    <span className="material-symbols-outlined">delete</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="lg:w-80">
+              <div className="bg-[#1c2620] rounded-xl p-6 sticky top-24">
+                <h2 className="text-white font-bold text-lg mb-4">Order Summary</h2>
+                <div className="space-y-2 mb-6">
+                  <div className="flex justify-between text-[#9eb7a8]">
+                    <span>Subtotal</span>
+                    <span>${total}</span>
+                  </div>
+                  <div className="flex justify-between text-[#9eb7a8]">
+                    <span>Shipping</span>
+                    <span className="text-[#36e27b]">Free</span>
+                  </div>
+                  <hr className="border-[#29382f]" />
+                  <div className="flex justify-between text-white font-bold text-lg">
+                    <span>Total</span>
+                    <span>${total}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleCheckout}
+                  disabled={checkoutLoading || items.length === 0}
+                  className="w-full h-12 bg-[#36e27b] text-[#112117] font-bold rounded-full hover:bg-[#2bc566] transition-colors disabled:opacity-50"
+                >
+                  {checkoutLoading ? 'Processing...' : 'Complete Order'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  )
+}
