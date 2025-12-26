@@ -1,18 +1,24 @@
 const pool = require("../database");
 
 module.exports = {
+  /**
+   * Create auth credentials with email
+   */
   createAuth: async (auth) => {
     await pool.query(
-      `INSERT INTO auth (username, password)
+      `INSERT INTO auth (email, password)
        VALUES ($1, $2)`,
-      [auth.username, auth.password]
+      [auth.email, auth.password]
     );
   },
 
-  getAuth: async (username) => {
+  /**
+   * Get auth credentials by email
+   */
+  getAuth: async (email) => {
     const result = await pool.query(
-      "SELECT * FROM auth WHERE username = $1",
-      [username]
+      "SELECT * FROM auth WHERE email = $1",
+      [email]
     );
     return result.rows[0];
   }

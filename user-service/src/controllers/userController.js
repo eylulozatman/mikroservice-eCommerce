@@ -20,12 +20,12 @@ const userService = require("../services/userService");
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 example: eylul
+ *                 example: eylul@example.com
  *               password:
  *                 type: string
  *                 example: 123456
@@ -64,12 +64,12 @@ exports.register = async (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 example: eylul
+ *                 example: eylul@example.com
  *               password:
  *                 type: string
  *                 example: 123456
@@ -112,9 +112,9 @@ exports.login = async (req, res) => {
  *                 user_id:
  *                   type: integer
  *                   example: 1
- *                 username:
+ *                 email:
  *                   type: string
- *                   example: eylul
+ *                   example: eylul@example.com
  *                 name:
  *                   type: string
  *                   example: Eylül

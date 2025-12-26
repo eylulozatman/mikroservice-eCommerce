@@ -7,7 +7,7 @@ const migrate = async () => {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         user_id SERIAL PRIMARY KEY,
-        username VARCHAR(50) UNIQUE NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
         name VARCHAR(50),
         surname VARCHAR(50),
         gender VARCHAR(10)
@@ -16,7 +16,7 @@ const migrate = async () => {
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS auth (
-        username VARCHAR(50) PRIMARY KEY,
+        email VARCHAR(100) PRIMARY KEY,
         password TEXT NOT NULL
       );
     `);
