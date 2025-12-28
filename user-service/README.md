@@ -7,15 +7,14 @@ Microservice for user authentication and management in the eCommerce platform.
 ### Authentication
 
 **POST /register**
-- **Description:** Register a new user.
+- **Description:** Register a new user. `name` is required.
 - **Request Body:**
   ```json
   {
     "email": "user@example.com",
     "password": "password123",
     "name": "Name",
-    "surname": "Surname",
-    "gender": "female" 
+    "surname": "Surname"
   }
   ```
   *(Note: `admin@gmail.com` or `test@gmail.com` automatically get `isAdmin: true`)*
@@ -64,7 +63,6 @@ Microservice for user authentication and management in the eCommerce platform.
     "email": "user@example.com",
     "name": "Name",
     "surname": "Surname",
-    "gender": "female",
     "isAdmin": false
   }
   ```
@@ -108,3 +106,6 @@ Microservice for user authentication and management in the eCommerce platform.
 ## Documentation
 
 Swagger UI available at: `http://localhost:3000/api-docs`
+
+Notes:
+- Registration now requires the `name` field and `gender` is no longer accepted or returned by the service.

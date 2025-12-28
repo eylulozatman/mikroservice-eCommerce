@@ -22,6 +22,7 @@ const userService = require("../services/userService");
  *             required:
  *               - email
  *               - password
+ *               - name
  *             properties:
  *               email:
  *                 type: string
@@ -35,9 +36,6 @@ const userService = require("../services/userService");
  *               surname:
  *                 type: string
  *                 example: Özatman
- *               gender:
- *                 type: string
- *                 example: female
  *     responses:
  *       201:
  *         description: User created
@@ -121,9 +119,6 @@ exports.login = async (req, res) => {
  *                 surname:
  *                   type: string
  *                   example: Özatman
- *                 gender:
- *                   type: string
- *                   example: female
  *                 isAdmin:
  *                   type: boolean
  *                   example: false
