@@ -26,12 +26,12 @@ async function request(path, options = {}) {
 
 // User API
 export const userApi = {
-  login: (email, password) => request('/api/user/login', {
+  login: (username, password) => request('/api/user/api/user/login', {
     method: 'POST',
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ username, password })
   }),
   
-  register: (name, email, password) => request('/api/user/register', {
+  register: (name, email, password) => request('/api/user/api/user/register', {
     method: 'POST',
     body: JSON.stringify({ name, email, password })
   })
