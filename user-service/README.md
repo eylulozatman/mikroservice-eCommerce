@@ -6,14 +6,97 @@ Microservice for user authentication and management in the eCommerce platform.
 
 ### Authentication
 
-- **POST /api/user/register** - Register a new user account with email and password
-- **POST /api/user/login** - Authenticate user with email and password, returns user info
+**POST /register**
+- **Description:** Register a new user.
+- **Request Body:**
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "password123",
+    "name": "Name",
+    "surname": "Surname",
+    "gender": "female" 
+  }
+  ```
+  *(Note: `admin@gmail.com` or `test@gmail.com` automatically get `isAdmin: true`)*
+- **Response:**
+  ```json
+  {
+    "user_id": 1,
+    "email": "user@example.com",
+    "name": "Name",
+    "surname": "Surname",
+    "isAdmin": false
+  }
+  ```
 
-### User Management
+**POST /login**
+- **Description:** Authenticate user.
+- **Request Body:**
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "password123"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "Login successful",
+    "user": {
+      "user_id": 1,
+      "email": "user@example.com",
+      "name": "Name",
+      "surname": "Surname",
+      "isAdmin": false
+    }
+  }
+  ```
 
-- **GET /api/user/:userId** - Retrieve user profile information by user ID
-- **GET /api/user/gift/:userId** - Get user's gift point balance
-- **POST /api/user/gift/add** - Add gift points to a user account
+### User Data
+
+**GET /{userId}**
+- **Description:** Retrieve user profile information.
+- **Response:**
+  ```json
+  {
+    "user_id": 1,
+    "email": "user@example.com",
+    "name": "Name",
+    "surname": "Surname",
+    "gender": "female",
+    "isAdmin": false
+  }
+  ```
+
+### Gift Points
+
+**GET /gift/{userId}**
+- **Description:** Get user's current gift point balance.
+- **Response:**
+  ```json
+  {
+    "user_id": 1,
+    "point": 0
+  }
+  ```
+
+**POST /gift/add**
+- **Description:** Add gift points to a user account.
+- **Request Body:**
+  ```json
+  {
+    "userId": 1,
+    "point": 10
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "user_id": 1,
+    "point": 10
+  }
+  ```
 
 ## Tech Stack
 
