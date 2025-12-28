@@ -9,7 +9,7 @@ const userService = require("../services/userService");
 
 /**
  * @swagger
- * /api/user/register:
+ * /register:
  *   post:
  *     summary: Register new user
  *     tags: [User]
@@ -53,7 +53,7 @@ exports.register = async (req, res) => {
 
 /**
  * @swagger
- * /api/user/login:
+ * /login:
  *   post:
  *     summary: Login user
  *     tags: [User]
@@ -90,7 +90,7 @@ exports.login = async (req, res) => {
 
 /**
  * @swagger
- * /api/user/{userId}:
+ * /{userId}:
  *   get:
  *     summary: Get user info by userId
  *     tags: [User]
@@ -124,6 +124,9 @@ exports.login = async (req, res) => {
  *                 gender:
  *                   type: string
  *                   example: female
+ *                 isAdmin:
+ *                   type: boolean
+ *                   example: false
  *       400:
  *         description: User not found or invalid request
  */
@@ -139,7 +142,7 @@ exports.getUserInfo = async (req, res) => {
 
 /**
  * @swagger
- * /api/user/gift/{userId}:
+ * /gift/{userId}:
  *   get:
  *     summary: Get user gift point
  *     tags: [User]
@@ -165,7 +168,7 @@ exports.getPoint = async (req, res) => {
 
 /**
  * @swagger
- * /api/user/gift/add:
+ * /gift/add:
  *   post:
  *     summary: Add gift point to user
  *     tags: [User]

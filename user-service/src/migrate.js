@@ -10,9 +10,20 @@ const migrate = async () => {
         email VARCHAR(100) UNIQUE NOT NULL,
         name VARCHAR(50),
         surname VARCHAR(50),
-        gender VARCHAR(10)
+        gender VARCHAR(10),
+        is_admin BOOLEAN DEFAULT FALSE
       );
     `);
+
+    // Add is_admin column if it doesn't exist (for existing databases)
+    try {
+      await pool.query(`
+        ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
+      `);
+    } catch (e) {
+      console.log("Column is_admin might already exist or error adding it:", e.message);
+    }
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS auth (

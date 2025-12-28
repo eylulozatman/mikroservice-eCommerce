@@ -18,11 +18,14 @@ exports.register = async ({ email, password, name, surname, gender }) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Create user in users table
+  const isAdmin = (email === "admin@gmail.com" || email === "test@gmail.com");
+
   const user = await userRepository.createUser({
     email,
     name: name || null,
     surname: surname || null,
-    gender: gender || null
+    gender: gender || null,
+    isAdmin
   });
 
   // Create auth credentials
@@ -38,7 +41,8 @@ exports.register = async ({ email, password, name, surname, gender }) => {
     user_id: user.user_id,
     email: user.email,
     name: user.name,
-    surname: user.surname
+    surname: user.surname,
+    isAdmin: user.is_admin
   };
 };
 
@@ -69,7 +73,8 @@ exports.login = async ({ email, password }) => {
       user_id: user.user_id,
       email: user.email,
       name: user.name,
-      surname: user.surname
+      surname: user.surname,
+      isAdmin: user.is_admin
     }
   };
 };
@@ -89,7 +94,8 @@ exports.getUserInfo = async (userId) => {
     email: user.email,
     name: user.name,
     surname: user.surname,
-    gender: user.gender
+    gender: user.gender,
+    isAdmin: user.is_admin
   };
 };
 
