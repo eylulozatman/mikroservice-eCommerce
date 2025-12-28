@@ -13,8 +13,7 @@ Microservice for user authentication and management in the eCommerce platform.
   {
     "email": "user@example.com",
     "password": "password123",
-    "name": "Name",
-    "surname": "Surname"
+    "name": "Name"
   }
   ```
   *(Note: `admin@gmail.com` or `test@gmail.com` automatically get `isAdmin: true`)*
@@ -24,7 +23,6 @@ Microservice for user authentication and management in the eCommerce platform.
     "user_id": 1,
     "email": "user@example.com",
     "name": "Name",
-    "surname": "Surname",
     "isAdmin": false
   }
   ```
@@ -46,7 +44,6 @@ Microservice for user authentication and management in the eCommerce platform.
       "user_id": 1,
       "email": "user@example.com",
       "name": "Name",
-      "surname": "Surname",
       "isAdmin": false
     }
   }
@@ -62,7 +59,6 @@ Microservice for user authentication and management in the eCommerce platform.
     "user_id": 1,
     "email": "user@example.com",
     "name": "Name",
-    "surname": "Surname",
     "isAdmin": false
   }
   ```
