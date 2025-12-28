@@ -1,0 +1,83 @@
+services:
+  # ======================================
+  # 1. VERİTABANI (USER DB)
+  # Servis adı: user-db
+  # ======================================
+  user-db:
+    image: postgres:14-alpine
+    container_name: user_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: user_db
+    ports:
+      - "5432:5432" 
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - eticaret-network
+    # Health Check 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d user_db"] 
+      interval: 5s 
+      timeout: 5s 
+      retries: 5 
+
+  # ======================================
+  # 2. USER SERVICE
+  # Servis adı: user-service
+  # ======================================
+  user-service:
+    build: ./user-service 
+    container_name: user_service_app
+    restart: always
+    depends_on:
+      user-db: 
+        condition: service_healthy 
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: user-db 
+      DB_PORT: 5432
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_NAME: user_db
+      PORT: 3000
+    command: sh -c "node src/migrate.js && node src/server.js"
+    networks:
+      - eticaret-network
+
+  # ======================================
+  # 3. API Gateway
+  # ======================================
+  api-gateway:
+    build: ./api-gateway
+    container_name: api_gateway_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - user-service
+    networks:
+      - eticaret-network
+  # ======================================
+  # 4. Frontend
+  # ======================================
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_USE_MOCK_GATEWAY=false
+      - VITE_API_BASE_URL=http://localhost:8000 
+    depends_on:
+      - api-gateway
+    networks:
+      - eticaret-network
+networks:
+  eticaret-network:
+    driver: bridge
+
+volumes:
+  user_db_data:
