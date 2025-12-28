@@ -12,18 +12,24 @@ app.use(cors({
 const PORT = process.env.PORT || 8000;
 
 // 1. User Service (Port 3000)
-// İstek: http://localhost:8000/api/user/login 
-// Hedef: http://localhost:3000/login
+// İstek: http://localhost:8000/api/user/login
+// Hedef: http://user-service:3000/api/user/login (path korunuyor)
 app.use("/api/user",
   createProxyMiddleware({
-    target: "http://user-service:3000", 
+    target: "http://user-service:3000",
     changeOrigin: true,
+    pathRewrite: (path) => '/api/user' + path,
+    on: {
+      proxyReq: (proxyReq, req) => {
+        console.log(`[PROXY] ${req.method} ${req.url} -> ${proxyReq.path}`);
+      }
+    }
   })
 );
 
 // 2. Product Service (Port 3001)
 // İstek: http://localhost:8000/api/products/addProduct
-// Hedef: http://localhost:3001/addProduct 
+// Hedef: http://localhost:3001/addProduct
 app.use(
   "/api/products",
   createProxyMiddleware({
