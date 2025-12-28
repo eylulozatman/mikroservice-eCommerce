@@ -8,9 +8,7 @@ const migrate = async () => {
       CREATE TABLE IF NOT EXISTS users (
         user_id SERIAL PRIMARY KEY,
         email VARCHAR(100) UNIQUE NOT NULL,
-        name VARCHAR(50),
-        surname VARCHAR(50),
-        gender VARCHAR(10),
+        name VARCHAR(100),
         is_admin BOOLEAN DEFAULT FALSE
       );
     `);

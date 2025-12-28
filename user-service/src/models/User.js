@@ -1,9 +1,7 @@
 class User {
-  constructor(username, name, surname, gender, isAdmin) {
+  constructor(username, name, isAdmin) {
     this.username = username;
     this.name = name;
-    this.surname = surname;
-    this.gender = gender;
     this.isAdmin = isAdmin || false;
   }
 }

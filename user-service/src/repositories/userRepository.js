@@ -6,10 +6,10 @@ module.exports = {
    */
   createUser: async (user) => {
     const result = await pool.query(
-      `INSERT INTO users (email, name, surname, is_admin)
-       VALUES ($1, $2, $3, $4)
-       RETURNING user_id, email, name, surname, is_admin`,
-      [user.email, user.name, user.surname, user.isAdmin]
+      `INSERT INTO users (email, name, is_admin)
+       VALUES ($1, $2, $3)
+       RETURNING user_id, email, name, is_admin`,
+      [user.email, user.name, user.isAdmin]
     );
     return result.rows[0];
   },

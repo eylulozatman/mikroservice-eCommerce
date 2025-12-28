@@ -7,7 +7,7 @@ const giftPointRepository = require("../repositories/giftPointRepository");
  * Register a new user with email, password, and optional profile info
  * Aligned with frontend API requirements (uses email instead of username)
  */
-exports.register = async ({ email, password, name, surname }) => {
+exports.register = async ({ email, password, name }) => {
   // Check if user already exists
   const existingUser = await userRepository.getByEmail(email);
   if (existingUser) {
@@ -27,7 +27,6 @@ exports.register = async ({ email, password, name, surname }) => {
   const user = await userRepository.createUser({
     email,
     name: name || null,
-    surname: surname || null,
     isAdmin
   });
 
@@ -44,7 +43,6 @@ exports.register = async ({ email, password, name, surname }) => {
     user_id: user.user_id,
     email: user.email,
     name: user.name,
-    surname: user.surname,
     isAdmin: user.is_admin
   };
 };
@@ -76,7 +74,6 @@ exports.login = async ({ email, password }) => {
       user_id: user.user_id,
       email: user.email,
       name: user.name,
-      surname: user.surname,
       isAdmin: user.is_admin
     }
   };
@@ -96,7 +93,6 @@ exports.getUserInfo = async (userId) => {
     user_id: user.user_id,
     email: user.email,
     name: user.name,
-    surname: user.surname,
     isAdmin: user.is_admin
   };
 };
