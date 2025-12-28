@@ -1,80 +1,129 @@
-const pool = require("../database");
 const bcrypt = require("bcrypt");
+const userRepository = require("../repositories/userRepository");
+const authRepository = require("../repositories/authRepository");
+const giftPointRepository = require("../repositories/giftPointRepository");
 
-exports.register = async ({ username, password, name, surname, gender }) => {
-  // users tablosu
-  const userResult = await pool.query(
-    `INSERT INTO users (username, name, surname, gender)
-     VALUES ($1, $2, $3, $4)
-     RETURNING user_id, username`,
-    [username, name, surname, gender]
-  );
+/**
+ * Register a new user with email, password, and optional profile info
+ * Aligned with frontend API requirements (uses email instead of username)
+ */
+exports.register = async ({ email, password, name, surname }) => {
+  // Check if user already exists
+  const existingUser = await userRepository.getByEmail(email);
+  if (existingUser) {
+    throw new Error("user-service error: User already exists with this email");
+  }
 
-  // auth tablosu
+  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await pool.query(
-    `INSERT INTO auth (username, password)
-     VALUES ($1, $2)`,
-    [username, hashedPassword]
-  );
+  // Create user in users table
+  const isAdmin = (email === "admin@gmail.com" || email === "test@gmail.com");
 
-  // gift point tablosu
-  await pool.query(
-    `INSERT INTO user_gift_point (user_id, point)
-     VALUES ($1, 0)`,
-    [userResult.rows[0].user_id]
-  );
-
-  return userResult.rows[0];
-};
-
-exports.login = async ({ username, password }) => {
-  const result = await pool.query(
-    `SELECT password FROM auth WHERE username = $1`,
-    [username]
-  );
-
-  if (result.rowCount === 0) {
-    throw new Error("User not found");
+  if (!name) {
+    throw new Error("user-service error: Name is required");
   }
 
-  const isMatch = await bcrypt.compare(password, result.rows[0].password);
+  const user = await userRepository.createUser({
+    email,
+    name: name || null,
+    surname: surname || null,
+    isAdmin
+  });
+
+  // Create auth credentials
+  await authRepository.createAuth({
+    email,
+    password: hashedPassword
+  });
+
+  // Initialize gift points
+  await giftPointRepository.initPoint(user.user_id);
+
+  return {
+    user_id: user.user_id,
+    email: user.email,
+    name: user.name,
+    surname: user.surname,
+    isAdmin: user.is_admin
+  };
+};
+
+/**
+ * Login user with email and password
+ * Returns user info and token (aligned with frontend)
+ */
+exports.login = async ({ email, password }) => {
+  // Get auth credentials
+  const auth = await authRepository.getAuth(email);
+
+  if (!auth) {
+    throw new Error("user-service error: User not found");
+  }
+
+  // Verify password
+  const isMatch = await bcrypt.compare(password, auth.password);
   if (!isMatch) {
-    throw new Error("Wrong password");
+    throw new Error("user-service error: Wrong password");
   }
 
-  return { message: "Login successful", username };
+  // Get user info
+  const user = await userRepository.getByEmail(email);
+
+  return {
+    message: "Login successful",
+    user: {
+      user_id: user.user_id,
+      email: user.email,
+      name: user.name,
+      surname: user.surname,
+      isAdmin: user.is_admin
+    }
+  };
 };
 
+/**
+ * Get user information by userId
+ */
 exports.getUserInfo = async (userId) => {
-  const result = await pool.query(
-    `SELECT user_id, username, name, surname, gender
-     FROM users
-     WHERE user_id = $1`,
-    [userId]
-  );
+  const user = await userRepository.getById(userId);
 
-  return result.rows[0];
+  if (!user) {
+    throw new Error("user-service error: User not found");
+  }
+
+  return {
+    user_id: user.user_id,
+    email: user.email,
+    name: user.name,
+    surname: user.surname,
+    isAdmin: user.is_admin
+  };
 };
 
+/**
+ * Get user gift points
+ */
 exports.getPoint = async (userId) => {
-  const result = await pool.query(
-    `SELECT point FROM user_gift_point WHERE user_id = $1`,
-    [userId]
-  );
+  const pointData = await giftPointRepository.getPoint(userId);
 
-  return result.rows[0];
+  if (!pointData) {
+    throw new Error("user-service error: Gift points not found for user");
+  }
+
+  return pointData;
 };
 
+/**
+ * Add gift points to user
+ */
 exports.addPoint = async ({ userId, point }) => {
-  const result = await pool.query(
-    `UPDATE user_gift_point
-     SET point = point + $1
-     WHERE user_id = $2
-     RETURNING point`,
-    [point, userId]
-  );
+  if (point <= 0) {
+    throw new Error("user-service error: Point value must be positive");
+  }
 
-  return result.rows[0];
+  await giftPointRepository.addPoint(userId, point);
+  const updatedPoints = await giftPointRepository.getPoint(userId);
+
+  return updatedPoints;
 };

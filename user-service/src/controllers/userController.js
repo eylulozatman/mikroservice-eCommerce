@@ -9,7 +9,7 @@ const userService = require("../services/userService");
 
 /**
  * @swagger
- * /api/user/register:
+ * /register:
  *   post:
  *     summary: Register new user
  *     tags: [User]
@@ -20,12 +20,13 @@ const userService = require("../services/userService");
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
+ *               - name
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 example: eylul
+ *                 example: eylul@example.com
  *               password:
  *                 type: string
  *                 example: 123456
@@ -35,9 +36,6 @@ const userService = require("../services/userService");
  *               surname:
  *                 type: string
  *                 example: Özatman
- *               gender:
- *                 type: string
- *                 example: female
  *     responses:
  *       201:
  *         description: User created
@@ -53,7 +51,7 @@ exports.register = async (req, res) => {
 
 /**
  * @swagger
- * /api/user/login:
+ * /login:
  *   post:
  *     summary: Login user
  *     tags: [User]
@@ -64,12 +62,12 @@ exports.register = async (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 example: eylul
+ *                 example: eylul@example.com
  *               password:
  *                 type: string
  *                 example: 123456
@@ -90,7 +88,7 @@ exports.login = async (req, res) => {
 
 /**
  * @swagger
- * /api/user/{userId}:
+ * /{userId}:
  *   get:
  *     summary: Get user info by userId
  *     tags: [User]
@@ -112,18 +110,18 @@ exports.login = async (req, res) => {
  *                 user_id:
  *                   type: integer
  *                   example: 1
- *                 username:
+ *                 email:
  *                   type: string
- *                   example: eylul
+ *                   example: eylul@example.com
  *                 name:
  *                   type: string
  *                   example: Eylül
  *                 surname:
  *                   type: string
  *                   example: Özatman
- *                 gender:
- *                   type: string
- *                   example: female
+ *                 isAdmin:
+ *                   type: boolean
+ *                   example: false
  *       400:
  *         description: User not found or invalid request
  */
@@ -139,7 +137,7 @@ exports.getUserInfo = async (req, res) => {
 
 /**
  * @swagger
- * /api/user/gift/{userId}:
+ * /gift/{userId}:
  *   get:
  *     summary: Get user gift point
  *     tags: [User]
@@ -165,7 +163,7 @@ exports.getPoint = async (req, res) => {
 
 /**
  * @swagger
- * /api/user/gift/add:
+ * /gift/add:
  *   post:
  *     summary: Add gift point to user
  *     tags: [User]

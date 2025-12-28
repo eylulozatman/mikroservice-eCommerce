@@ -23,7 +23,7 @@ router.post("/test", (req, res) => {
   res.json({ received: req.body });
 });
 
-app.use("/api/user", router);
+app.use("/", router);
 
 // Swagger setup
 const swaggerOptions = {
