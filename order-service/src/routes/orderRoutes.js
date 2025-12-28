@@ -1,0 +1,79 @@
+const express = require('express');
+const router = express.Router();
+const orderController = require('../controllers/orderController');
+const { idempotencyMiddleware } = require('../middleware/idempotencyMiddleware');
+const { authenticate, checkOwnership, authorize } = require('../middleware/auth');
+const {
+    createOrderValidation,
+    getOrderValidation,
+    getUserOrdersValidation,
+    updateStatusValidation,
+    cancelOrderValidation
+} = require('../middleware/validation');
+
+/**
+ * Order Routes
+ * Production-ready RESTful API with authentication and validation
+ */
+
+/**
+ * @route   POST /api/orders
+ * @desc    Create a new order
+ * @access  Protected - authenticated users only
+ * @header  Authorization: Bearer <token>
+ * @header  Idempotency-Key: UUID - Required to prevent duplicate orders
+ */
+router.post('/orders',
+    authenticate,
+    idempotencyMiddleware,
+    createOrderValidation,
+    (req, res, next) => orderController.createOrder(req, res, next)
+);
+
+/**
+ * @route   GET /api/orders/:orderId
+ * @desc    Get order details by ID
+ * @access  Protected - order owner or admin
+ */
+router.get('/orders/:orderId',
+    authenticate,
+    getOrderValidation,
+    (req, res, next) => orderController.getOrderById(req, res, next)
+);
+
+/**
+ * @route   GET /api/orders/user/:userId
+ * @desc    Get all orders for a specific user
+ * @access  Protected - own orders only (or admin)
+ */
+router.get('/orders/user/:userId',
+    authenticate,
+    checkOwnership,
+    getUserOrdersValidation,
+    (req, res, next) => orderController.getOrdersByUserId(req, res, next)
+);
+
+/**
+ * @route   PATCH /api/orders/:orderId/status
+ * @desc    Update order status
+ * @access  Protected - admin only
+ */
+router.patch('/orders/:orderId/status',
+    authenticate,
+    authorize('admin'),
+    updateStatusValidation,
+    (req, res, next) => orderController.updateOrderStatus(req, res, next)
+);
+
+/**
+ * @route   DELETE /api/orders/:orderId
+ * @desc    Cancel an order
+ * @access  Protected - order owner or admin
+ */
+router.delete('/orders/:orderId',
+    authenticate,
+    cancelOrderValidation,
+    (req, res, next) => orderController.cancelOrder(req, res, next)
+);
+
+module.exports = router;
