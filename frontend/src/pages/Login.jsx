@@ -27,7 +27,7 @@ export default function Login() {
     })
     
     if (data) {
-      login(data.userId, data.name)
+      login(data.user.user_id, data.user.name)
       navigate('/')
     }
     setLoading(false)

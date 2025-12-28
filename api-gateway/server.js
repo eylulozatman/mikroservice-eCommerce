@@ -13,12 +13,12 @@ const PORT = process.env.PORT || 8000;
 
 // 1. User Service (Port 3000)
 // İstek: http://localhost:8000/api/user/login
-// Hedef: http://user-service:3000/api/user/login (path korunuyor)
+// Hedef: http://user-service:3000/login (user-service "/" prefix ile çalışıyor)
 app.use("/api/user",
   createProxyMiddleware({
     target: "http://user-service:3000",
     changeOrigin: true,
-    pathRewrite: (path) => '/api/user' + path,
+    pathRewrite: { '^/api/user': '' },
     on: {
       proxyReq: (proxyReq, req) => {
         console.log(`[PROXY] ${req.method} ${req.url} -> ${proxyReq.path}`);
