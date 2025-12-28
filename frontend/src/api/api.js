@@ -19,14 +19,14 @@ async function request(path, options = {}) {
 
 // User API - /api/user -> user-service:3000
 export const userApi = {
-  login: (username, password) => request('/api/user/login', {
+  login: (email, password) => request('/api/user/login', {
     method: 'POST',
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ email, password })
   }),
 
-  register: (username, password, name) => request('/api/user/register', {
+  register: (email, password, name) => request('/api/user/register', {
     method: 'POST',
-    body: JSON.stringify({ username, password, name })
+    body: JSON.stringify({ email, password, name })
   })
 }
 

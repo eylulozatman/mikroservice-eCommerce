@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { userApi } from '../api/api'
 
 export default function Register() {
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -12,7 +12,7 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!username || !name || !password) {
+    if (!email || !name || !password) {
       setError('Please fill in all fields')
       return
     }
@@ -20,7 +20,7 @@ export default function Register() {
     setLoading(true)
     setError('')
     
-    const data = await userApi.register(username, password, name).catch(err => {
+    const data = await userApi.register(email, password, name).catch(err => {
       setError(err.message)
       return null
     })
@@ -50,13 +50,13 @@ export default function Register() {
           )}
 
           <div>
-            <label className="block text-[#9eb7a8] text-sm font-medium mb-2">Username</label>
+            <label className="block text-[#9eb7a8] text-sm font-medium mb-2">Email</label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-[#112117] border border-[#29382f] rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#36e27b] focus:border-transparent outline-none transition-shadow"
-              placeholder="your_username"
+              placeholder="you@example.com"
             />
           </div>
 

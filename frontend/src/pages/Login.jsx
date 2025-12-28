@@ -4,7 +4,7 @@ import { userApi } from '../api/api'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -13,7 +13,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!username || !password) {
+    if (!email || !password) {
       setError('Please fill in all fields')
       return
     }
@@ -21,7 +21,7 @@ export default function Login() {
     setLoading(true)
     setError('')
     
-    const data = await userApi.login(username, password).catch(err => {
+    const data = await userApi.login(email, password).catch(err => {
       setError(err.message)
       return null
     })
@@ -52,13 +52,13 @@ export default function Login() {
           )}
 
           <div>
-            <label className="block text-[#9eb7a8] text-sm font-medium mb-2">Username</label>
+            <label className="block text-[#9eb7a8] text-sm font-medium mb-2">Email</label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-[#112117] border border-[#29382f] rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#36e27b] focus:border-transparent outline-none transition-shadow"
-              placeholder="your_username"
+              placeholder="you@example.com"
             />
           </div>
 
