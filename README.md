@@ -142,11 +142,17 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
 
-#Run
+# Run
 <img width="1366" height="230" alt="image" src="https://github.com/user-attachments/assets/2ff70a49-f1b2-4b6b-bc42-c92bbc05c4af" />
-#Geçici olarak manuel ürün ekleme
+
+
+
+# Geçici olarak manuel ürün ekleme
 <img width="1390" height="122" alt="image" src="https://github.com/user-attachments/assets/e4b65075-b064-42c8-b761-17d2b8d35b22" />
-#Sonuç
+
+
+
+# Sonuç
 <img width="2740" height="274" alt="image" src="https://github.com/user-attachments/assets/b358aaba-4ef0-4af4-a078-7752cc4f3411" />
 
 
