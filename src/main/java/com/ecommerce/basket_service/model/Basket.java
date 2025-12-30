@@ -15,6 +15,7 @@ public class Basket {
     private String userId;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "basket_id")
     private List<BasketItem> items;
 
     // Sepet toplam tutarını hesaplayan yardımcı metot
