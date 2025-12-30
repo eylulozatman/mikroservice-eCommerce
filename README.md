@@ -156,3 +156,6 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 <img width="2740" height="274" alt="image" src="https://github.com/user-attachments/assets/b358aaba-4ef0-4af4-a078-7752cc4f3411" />
 
 
+
+# DB (geçici)
+<img width="926" height="462" alt="image" src="https://github.com/user-attachments/assets/19999491-9708-4c5e-869b-9e9a1ac35495" />
