@@ -10,6 +10,7 @@ public record UpdateProductRequest(
     @Pattern(regexp = "^[A-Z]{3}$", message = "currency must be 3-letter uppercase like TRY/USD/EUR")
     String currency,
     @Size(max = 120) String category,
-    Boolean isActive
+    Boolean isActive,
+    @Size(max = 2048) String imageUrl
 ) {}
 

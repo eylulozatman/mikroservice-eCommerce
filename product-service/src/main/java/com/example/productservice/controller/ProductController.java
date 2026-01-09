@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +25,7 @@ public class ProductController {
   }
 
   @GetMapping("/products/{id}")
-  public ProductResponse getById(@PathVariable UUID id) {
+  public ProductResponse getById(@PathVariable Long id) {
     return productService.getById(id);
   }
 
@@ -37,13 +36,13 @@ public class ProductController {
   }
 
   @PutMapping("/products/{id}")
-  public ProductResponse update(@PathVariable UUID id, @Valid @RequestBody UpdateProductRequest req) {
+  public ProductResponse update(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest req) {
     return productService.update(id, req);
   }
 
   @DeleteMapping("/products/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@PathVariable UUID id) {
+  public void delete(@PathVariable Long id) {
     productService.delete(id);
   }
 }

@@ -9,8 +9,6 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -25,13 +23,15 @@ public class ProductService {
         .price(req.price())
         .currency(req.currency() == null ? "TRY" : req.currency())
         .category(req.category())
+        .imageUrl(req.imageUrl())       
         .isActive(true)
         .build();
+
     return toResponse(productRepository.save(p));
   }
 
   @Transactional(readOnly = true)
-  public ProductResponse getById(UUID id) {
+  public ProductResponse getById(Long id) {
     Product p = productRepository.findById(id)
         .orElseThrow(() -> new NotFoundException("Product not found: " + id));
     return toResponse(p);
@@ -66,7 +66,7 @@ public class ProductService {
   }
 
   @Transactional
-  public ProductResponse update(UUID id, UpdateProductRequest req) {
+  public ProductResponse update(Long id, UpdateProductRequest req) {
     Product p = productRepository.findById(id)
         .orElseThrow(() -> new NotFoundException("Product not found: " + id));
 
@@ -77,11 +77,13 @@ public class ProductService {
     p.setCategory(req.category());
     if (req.isActive() != null) p.setIsActive(req.isActive());
 
+    p.setImageUrl(req.imageUrl());
+
     return toResponse(productRepository.save(p));
   }
 
   @Transactional
-  public void delete(UUID id) {
+  public void delete(Long id) {
     Product p = productRepository.findById(id)
         .orElseThrow(() -> new NotFoundException("Product not found: " + id));
     p.setIsActive(false); // soft delete
@@ -90,9 +92,16 @@ public class ProductService {
 
   private ProductResponse toResponse(Product p) {
     return new ProductResponse(
-        p.getId(), p.getName(), p.getDescription(), p.getPrice(),
-        p.getCurrency(), p.getCategory(), p.getIsActive(),
-        p.getCreatedAt(), p.getUpdatedAt()
+        p.getId(),
+        p.getName(),
+        p.getDescription(),
+        p.getPrice(),
+        p.getCurrency(),
+        p.getCategory(),
+        p.getImageUrl(),     
+        p.getIsActive(),
+        p.getCreatedAt(),
+        p.getUpdatedAt()
     );
   }
 }

@@ -19,9 +19,8 @@ import java.util.UUID;
 public class Product {
 
   @Id
-  @GeneratedValue
-  @Column(columnDefinition = "uuid")
-  private UUID id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   @Column(nullable = false, length = 200)
   private String name;
@@ -37,6 +36,9 @@ public class Product {
 
   @Column(length = 120)
   private String category;
+
+  @Column(name = "image_url", columnDefinition = "text")
+  private String imageUrl;
 
   @Column(nullable = false)
   private Boolean isActive;
