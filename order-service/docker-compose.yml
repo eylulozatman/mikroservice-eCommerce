@@ -19,7 +19,7 @@ services:
       - INVENTORY_SERVICE_URL=http://inventory-service:3003
       - USER_SERVICE_URL=http://user-service:3000
       - BASKET_SERVICE_URL=http://basket-service:3002
-      - PRODUCT_SERVICE_URL=http://product-service:8001
+      - PRODUCT_SERVICE_URL=http://product-service:3001
       - SKIP_AUTH=true
       - INVENTORY_SERVICE_MOCK=true
     depends_on:
