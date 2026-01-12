@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # Order Service
+  order-service:
+    build: .
+    container_name: order-service
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - DB_HOST=order-db
+      - DB_PORT=5432
+      - DB_NAME=order_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - INVENTORY_SERVICE_URL=http://inventory-service:3003
+      - USER_SERVICE_URL=http://user-service:3000
+      - BASKET_SERVICE_URL=http://basket-service:3002
+      - PRODUCT_SERVICE_URL=http://product-service:8001
+      - SKIP_AUTH=true
+      - INVENTORY_SERVICE_MOCK=true
+    depends_on:
+      order-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - eticaret-network
+    restart: unless-stopped
+
+  # Order PostgreSQL Database
+  order-db:
+    image: postgres:15-alpine
+    container_name: order_postgres
+    environment:
+      - POSTGRES_DB=order_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d order_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eticaret-network
+    restart: unless-stopped
+
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: order_rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5674:5672"
+      - "15674:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - eticaret-network
+    restart: unless-stopped
+
+networks:
+  eticaret-network:
+    driver: bridge
+
+volumes:
+  order_db_data:
+  rabbitmq_data:
