@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import { useBasket } from '../context/BasketContext'
 import { useAuth } from '../context/AuthContext'
-import { orderApi } from '../api/api'
+import { orderApi, inventoryApi } from '../api/api'
 
 export default function Basket() {
   const { items, loading, fetchBasket, removeItem, clearBasket } = useBasket()
@@ -28,25 +28,54 @@ export default function Basket() {
 
     setCheckoutLoading(true)
     
-    // Backend'in (Order Service validation.js) istediği format
-    const orderPayload = {
-      userId: parseInt(userId), 
-      items: items.map(item => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        unitPrice: parseFloat(item.price || 0) 
-      })),
-      shippingAddress: {
-        city: "Istanbul",
-        street: "Örnek Cadde No:1",
-        zipCode: "34000"
-      },
-      paymentDetails: {
-        method: "credit_card"
-      }
-    }
-
     try {
+      // 1. Önce tüm ürünler için inventory check yap
+      const outOfStockItems = []
+      
+      for (const item of items) {
+        try {
+          const result = await inventoryApi.check(item.productId, item.quantity)
+          if (!result.available) {
+            outOfStockItems.push({
+              name: item.productName,
+              requested: item.quantity,
+              available: result.currentStock || 0
+            })
+          }
+        } catch (err) {
+          console.error(`Inventory check failed for ${item.productName}:`, err)
+          // Inventory service erişilemezse devam et (optional)
+        }
+      }
+
+      // 2. Stokta olmayan ürün varsa hata göster
+      if (outOfStockItems.length > 0) {
+        const message = outOfStockItems.map(item => 
+          `${item.name}: ${item.requested} adet istendi, ${item.available} adet mevcut`
+        ).join('\n')
+        alert('Yetersiz stok:\n' + message)
+        setCheckoutLoading(false)
+        return
+      }
+
+      // 3. Tüm stoklar uygunsa sipariş oluştur
+      const orderPayload = {
+        userId: parseInt(userId), 
+        items: items.map(item => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: parseFloat(item.price || 0) 
+        })),
+        shippingAddress: {
+          city: "Istanbul",
+          street: "Örnek Cadde No:1",
+          zipCode: "34000"
+        },
+        paymentDetails: {
+          method: "credit_card"
+        }
+      }
+
       const data = await orderApi.create(orderPayload, null)
       
       if (data?.success) {
