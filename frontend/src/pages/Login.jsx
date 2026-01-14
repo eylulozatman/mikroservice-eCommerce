@@ -20,12 +20,11 @@ export default function Login() {
 
     setLoading(true)
     setError('')
-    
+
     const data = await userApi.login(email, password).catch(err => {
       setError(err.message)
       return null
     })
-    
     if (data) {
       login(data.user.user_id, data.user.name)
       navigate('/')

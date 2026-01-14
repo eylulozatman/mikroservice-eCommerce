@@ -45,7 +45,7 @@ export const userApi = {
 
 // Product API - /api/products -> product-service:3001
 export const productApi = {
-  list: () => request('/api/products/list')
+  list: () => request('/api/products')
 }
 
 // Inventory API - /api/inventory -> inventory-service:3003
@@ -80,11 +80,11 @@ export const orderApi = {
   create: (orderData, token) => {
     // Backend Idempotency-Key header'ı zorunlu tutuyor
     const idempotencyKey = generateUUID();
-    
+
     return request('/api/orders', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`, 
+        'Authorization': `Bearer ${token}`,
         'Idempotency-Key': idempotencyKey
       },
       body: JSON.stringify(orderData)

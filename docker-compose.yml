@@ -17,7 +17,7 @@ services:
       - user_db_data:/var/lib/postgresql/data
     networks:
       - eticaret-network
-    # Health Check 
+    # Health Check
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U myuser -d user_db" ]
       interval: 5s
@@ -152,6 +152,47 @@ services:
     networks:
       - eticaret-network
     restart: unless-stopped
+
+  # ======================================
+  # 8. Product Service
+  # ======================================
+  product-db:
+      platform: linux/amd64
+      image: postgres:15
+      container_name: product-db
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: product_db
+      ports:
+        - "5435:5432"
+      volumes:
+        - product_db_data:/var/lib/postgresql/data
+      healthcheck:
+        test: [ "CMD-SHELL", "pg_isready -U postgres -d product_db" ]
+        interval: 5s
+        timeout: 5s
+        retries: 20
+
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    depends_on:
+      product-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: product-db
+      DB_PORT: 5432
+      DB_NAME: product_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "3001:3001"
+
+
+
 networks:
   eticaret-network:
     driver: bridge
@@ -160,3 +201,4 @@ volumes:
   user_db_data:
   order_db_data:
   rabbitmq_data:
+  product_db_data:
