@@ -5,3 +5,17 @@ node_modules
 AGENTS.md
 code.html
 screen.png
+
+# Java Build Output
+**/target/
+*.jar
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
