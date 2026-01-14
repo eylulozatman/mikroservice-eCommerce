@@ -23,7 +23,7 @@ const {
  * @header  Authorization: Bearer <token>
  * @header  Idempotency-Key: UUID - Required to prevent duplicate orders
  */
-router.post('/orders',
+router.post('/',
     authenticate,
     idempotencyMiddleware,
     createOrderValidation,
@@ -31,22 +31,22 @@ router.post('/orders',
 );
 
 /**
- * @route   GET /api/orders/:orderId
+ * @route   GET /:orderId
  * @desc    Get order details by ID
  * @access  Protected - order owner or admin
  */
-router.get('/orders/:orderId',
+router.get('/:orderId',
     authenticate,
     getOrderValidation,
     (req, res, next) => orderController.getOrderById(req, res, next)
 );
 
 /**
- * @route   GET /api/orders/user/:userId
+ * @route   GET /user/:userId
  * @desc    Get all orders for a specific user
  * @access  Protected - own orders only (or admin)
  */
-router.get('/orders/user/:userId',
+router.get('/user/:userId',
     authenticate,
     checkOwnership,
     getUserOrdersValidation,
@@ -54,11 +54,11 @@ router.get('/orders/user/:userId',
 );
 
 /**
- * @route   PATCH /api/orders/:orderId/status
+ * @route   PATCH /:orderId/status
  * @desc    Update order status
  * @access  Protected - admin only
  */
-router.patch('/orders/:orderId/status',
+router.patch('/:orderId/status',
     authenticate,
     authorize('admin'),
     updateStatusValidation,
@@ -66,11 +66,11 @@ router.patch('/orders/:orderId/status',
 );
 
 /**
- * @route   DELETE /api/orders/:orderId
+ * @route   DELETE /:orderId
  * @desc    Cancel an order
  * @access  Protected - order owner or admin
  */
-router.delete('/orders/:orderId',
+router.delete('/:orderId',
     authenticate,
     cancelOrderValidation,
     (req, res, next) => orderController.cancelOrder(req, res, next)

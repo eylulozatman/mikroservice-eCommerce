@@ -21,19 +21,51 @@ export default function Basket() {
 
   const handleCheckout = async () => {
     if (items.length === 0) return
+    if (!userId) {
+      alert("Lütfen sipariş vermek için giriş yapın.")
+      return
+    }
+
     setCheckoutLoading(true)
     
-    const data = await orderApi.checkout(userId).catch(err => {
-      alert(err.message)
-      return null
-    })
-    
-    if (data?.success) {
-      clearBasket()
-      alert('Order placed successfully! Order ID: ' + data.orderId)
-      navigate('/')
+    // Backend'in (Order Service validation.js) istediği format
+    const orderPayload = {
+      userId: parseInt(userId), 
+      items: items.map(item => ({
+        productId: item.product?.id || item.productId,
+        quantity: item.quantity,
+        //  Product içinden unit price gelmeli.
+        unitPrice: parseFloat(item.product?.price || 0) 
+      })),
+      //  Sabit bir adres gönderiyoruz.
+      shippingAddress: {
+        city: "Istanbul",
+        street: "Örnek Cadde No:1",
+        zipCode: "34000"
+      },
+      paymentDetails: {
+        method: "credit_card"
+      }
     }
-    setCheckoutLoading(false)
+
+    try {
+      // orderApi.create fonksiyonunu çağırıyoruz
+      // AuthContext kısmında token olmadığı için ikinci parametre null gidiyor.
+      // Backend'de SKIP_AUTH=true olduğu için sorun olmaması lazım.
+      const data = await orderApi.create(orderPayload, null)
+      
+      if (data?.success) {
+        // Başarılıysa sepeti temizle
+        clearBasket()
+        alert('Sipariş başarıyla alındı! Sipariş No: ' + (data.order?.id || data.orderId))
+        navigate('/') 
+      }
+    } catch (err) {
+      console.error("Checkout hatası:", err)
+      alert('Sipariş oluşturulurken hata: ' + err.message)
+    } finally {
+      setCheckoutLoading(false)
+    }
   }
 
   const total = items.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)

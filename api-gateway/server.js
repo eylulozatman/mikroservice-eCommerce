@@ -62,7 +62,11 @@ app.use(
   createProxyMiddleware({
     target: "http://order-service:3004",
     changeOrigin: true,
+    pathRewrite: {
+      '^/api/orders': '',
+    },
   })
+  
 );
 
 //Health Check endpoint'i

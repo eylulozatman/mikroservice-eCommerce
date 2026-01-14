@@ -98,11 +98,11 @@ app.get('/', (req, res) => {
         description: 'E-Commerce Order Management with Saga Orchestration',
         endpoints: {
             health: 'GET /health',
-            createOrder: 'POST /api/orders',
-            getOrder: 'GET /api/orders/:orderId',
-            getUserOrders: 'GET /api/orders/user/:userId',
-            updateStatus: 'PATCH /api/orders/:orderId/status',
-            cancelOrder: 'DELETE /api/orders/:orderId'
+            createOrder: 'POST /',
+            getOrder: 'GET /:orderId',
+            getUserOrders: 'GET /user/:userId',
+            updateStatus: 'PATCH /:orderId/status',
+            cancelOrder: 'DELETE /:orderId'
         }
     });
 });
@@ -110,7 +110,7 @@ app.get('/', (req, res) => {
 /**
  * API Routes
  */
-app.use('/api', orderRoutes);
+app.use('/', orderRoutes);
 
 /**
  * 404 Handler

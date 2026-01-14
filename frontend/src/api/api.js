@@ -3,6 +3,19 @@
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
+// Idempotency Key için basit UUID oluşturucu, order fonksiyonlarının çalışması için
+// (Tarayıcı desteği varsa crypto.randomUUID kullanılır, yoksa fallback çalışır)
+function generateUUID() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 async function request(path, options = {}) {
   const response = await fetch(API_BASE + path, {
     ...options,
@@ -63,8 +76,34 @@ export const basketApi = {
 
 // Order API - /api/orders -> order-service:3004
 export const orderApi = {
-  checkout: (userId) => request('/api/orders/checkout', {
-    method: 'POST',
-    body: JSON.stringify({ userId })
+  // Sipariş Oluşturma
+  create: (orderData, token) => {
+    // Backend Idempotency-Key header'ı zorunlu tutuyor
+    const idempotencyKey = generateUUID();
+    
+    return request('/api/orders', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`, 
+        'Idempotency-Key': idempotencyKey
+      },
+      body: JSON.stringify(orderData)
+    })
+  },
+
+  // Kullanıcının Siparişlerini Getirme
+  getUserOrders: (userId, token) => request(`/api/orders/user/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  }),
+
+  // Tekil Sipariş Detayı
+  getOrder: (orderId, token) => request(`/api/orders/${orderId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
   })
 }
