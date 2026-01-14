@@ -157,24 +157,24 @@ services:
   # 8. Product Service
   # ======================================
   product-db:
-      platform: linux/amd64
-      image: postgres:15
-      container_name: product-db
-      environment:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_DB: product_db
-      ports:
-        - "5435:5432"
-      volumes:
-        - product_db_data:/var/lib/postgresql/data
-      healthcheck:
-        test: [ "CMD-SHELL", "pg_isready -U postgres -d product_db" ]
-        interval: 5s
-        timeout: 5s
-        retries: 20
-      networks:
-        - eticaret-network
+    platform: linux/amd64
+    image: docker.io/library/postgres:15
+    container_name: product-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: product_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d product_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - eticaret-network
 
   product-service:
     build:
@@ -200,7 +200,7 @@ services:
   # ======================================
   inventory-db:
     platform: linux/amd64
-    image: postgres:15
+    image: docker.io/library/postgres:15
     container_name: inventory-db
     environment:
       POSTGRES_USER: postgres
@@ -245,7 +245,7 @@ services:
   # ======================================
   basket-db:
     platform: linux/amd64
-    image: postgres:15
+    image: docker.io/library/postgres:15
     container_name: basket-db
     environment:
       POSTGRES_USER: postgres
@@ -291,8 +291,6 @@ services:
       - "3002:3002"
     networks:
       - eticaret-network
-
-
 
 networks:
   eticaret-network:

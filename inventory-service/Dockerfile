@@ -1,5 +1,11 @@
-FROM eclipse-temurin:17-jre
+FROM docker.io/library/maven:3.9-eclipse-temurin-17 AS builder
 WORKDIR /app
-COPY target/inventory-service-1.0.0.jar /app/app.jar
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+FROM docker.io/library/eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=builder /app/target/inventory-service-1.0.0.jar /app/app.jar
 EXPOSE 3003
 CMD ["java", "-jar", "app.jar"]
