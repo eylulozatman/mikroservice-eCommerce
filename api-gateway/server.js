@@ -55,11 +55,20 @@ app.use(
 );
 
 // 4. Inventory Service (Port 3003)
+// İstek: http://localhost:8000/api/inventory/check
+// Hedef: http://inventory-service:3003/inventory/check
 app.use(
   "/api/inventory",
   createProxyMiddleware({
     target: "http://inventory-service:3003",
     changeOrigin: true,
+    pathRewrite: (path, req) => {
+      // Express middleware path'i kesiyor
+      // "/" gelirse "/inventory", "/check" gelirse "/inventory/check" olarak yönlendir
+      const newPath = path === '/' ? '/inventory' : '/inventory' + path;
+      console.log(`[PROXY] ${req.method} /api/inventory${path} -> ${newPath}`);
+      return newPath;
+    }
   })
 );
 

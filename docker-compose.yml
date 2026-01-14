@@ -195,6 +195,51 @@ services:
     networks:
       - eticaret-network
 
+  # ======================================
+  # 9. Inventory Database
+  # ======================================
+  inventory-db:
+    platform: linux/amd64
+    image: postgres:15
+    container_name: inventory-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: inventory_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - inventory_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d inventory_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - eticaret-network
+
+  # ======================================
+  # 10. Inventory Service
+  # ======================================
+  inventory-service:
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    depends_on:
+      inventory-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: inventory-db
+      DB_PORT: 5432
+      DB_NAME: inventory_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "3003:3003"
+    networks:
+      - eticaret-network
+
 
 
 networks:
@@ -206,3 +251,4 @@ volumes:
   order_db_data:
   rabbitmq_data:
   product_db_data:
+  inventory_db_data:

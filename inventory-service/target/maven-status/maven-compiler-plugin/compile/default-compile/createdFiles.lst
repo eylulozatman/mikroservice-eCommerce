@@ -1,0 +1,14 @@
+com/example/inventoryservice/entity/Inventory.class
+com/example/inventoryservice/exception/InsufficientStockException.class
+com/example/inventoryservice/dto/CheckResponse.class
+com/example/inventoryservice/dto/DecreaseRequest.class
+com/example/inventoryservice/service/InventoryService.class
+com/example/inventoryservice/InventoryServiceApplication.class
+com/example/inventoryservice/dto/CheckRequest.class
+com/example/inventoryservice/entity/Inventory$InventoryBuilder.class
+com/example/inventoryservice/controller/InventoryController.class
+com/example/inventoryservice/exception/NotFoundException.class
+com/example/inventoryservice/repository/InventoryRepository.class
+com/example/inventoryservice/exception/ApiError.class
+com/example/inventoryservice/dto/InventoryResponse.class
+com/example/inventoryservice/exception/GlobalExceptionHandler.class
