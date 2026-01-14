@@ -39,7 +39,9 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiError> handleGeneric(Exception ex, HttpServletRequest req) {
-    ApiError err = new ApiError(Instant.now(), 500, "Internal Server Error", "Unexpected error occurred", req.getRequestURI(), null);
+    // Log the actual exception for debugging
+    ex.printStackTrace();
+    ApiError err = new ApiError(Instant.now(), 500, "Internal Server Error", "Unexpected error occurred: " + ex.getMessage(), req.getRequestURI(), null);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
   }
 }

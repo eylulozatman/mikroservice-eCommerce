@@ -18,9 +18,9 @@ export default function Home() {
   const loadProducts = async () => {
     const data = await productApi.list().catch(err => {
       setError(err.message)
-      return { products: [] }
+      return { items: [] }
     })
-    setProducts(data.products)
+    setProducts(data.items || [])
     setLoading(false)
   }
 

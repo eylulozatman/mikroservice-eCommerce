@@ -173,6 +173,8 @@ services:
         interval: 5s
         timeout: 5s
         retries: 20
+      networks:
+        - eticaret-network
 
   product-service:
     build:
@@ -190,6 +192,8 @@ services:
       DB_PASSWORD: postgres
     ports:
       - "3001:3001"
+    networks:
+      - eticaret-network
 
 
 

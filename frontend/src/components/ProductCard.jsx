@@ -13,15 +13,13 @@ export default function ProductCard({ product, onAddToBasket }) {
     <div className="group relative flex flex-col bg-[#1c2620] rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-[#36e27b]/10 transition-all duration-300 transform hover:-translate-y-1">
       <div className="relative w-full pt-[100%] bg-[#253028] overflow-hidden">
         <img
-          src={product.image}
-          alt={product.title}
+          src={product.imageUrl}
+          alt={product.name}
           className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        {product.badge && (
-          <div className={`absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full ${
-            product.badge === 'Sale' ? 'bg-[#e23636] text-white' : 'bg-[#36e27b] text-[#112117]'
-          }`}>
-            {product.badge}
+        {product.category && (
+          <div className="absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full bg-[#36e27b] text-[#112117]">
+            {product.category}
           </div>
         )}
       </div>
@@ -29,7 +27,7 @@ export default function ProductCard({ product, onAddToBasket }) {
       <div className="flex flex-col flex-grow p-5 gap-3">
         <div className="flex-grow">
           <div className="flex justify-between items-start mb-1">
-            <h3 className="text-white text-lg font-bold leading-tight">{product.title}</h3>
+            <h3 className="text-white text-lg font-bold leading-tight">{product.name}</h3>
             <span className="text-[#36e27b] font-bold text-lg">${product.price}</span>
           </div>
           <p className="text-[#9eb7a8] text-sm leading-relaxed">{product.description}</p>

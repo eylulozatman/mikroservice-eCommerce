@@ -28,13 +28,20 @@ app.use("/api/user",
 );
 
 // 2. Product Service (Port 3001)
-// İstek: http://localhost:8000/api/products/addProduct
-// Hedef: http://localhost:3001/addProduct
+// İstek: http://localhost:8000/api/products
+// Hedef: http://product-service:3001/products
+// Not: Express middleware /api/products prefix'ini kesiyor, req.url "/" olarak gelir
 app.use(
   "/api/products",
   createProxyMiddleware({
     target: "http://product-service:3001",
     changeOrigin: true,
+    pathRewrite: (path, req) => {
+
+      const newPath = path === '/' ? '/products' : '/products' + path;
+      console.log(`[PROXY] ${req.method} /api/products${path} -> ${newPath}`);
+      return newPath;
+    }
   })
 );
 
@@ -66,7 +73,7 @@ app.use(
       '^/api/orders': '',
     },
   })
-  
+
 );
 
 //Health Check endpoint'i
