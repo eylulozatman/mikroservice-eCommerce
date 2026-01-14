@@ -21,7 +21,7 @@ public class ProductController {
       @RequestParam(required = false) Integer size,
       @RequestParam(required = false) Boolean onlyActive
   ) {
-    return productService.list(page, size, category, onlyActive);
+    return productService.list(page, size, category, onlyActive); 
   }
 
   @GetMapping("/products/{id}")
