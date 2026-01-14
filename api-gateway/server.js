@@ -46,11 +46,20 @@ app.use(
 );
 
 // 3. Basket (Sepet) Service (Port 3002)
+// İstek: http://localhost:8000/api/basket/{userId}
+// Hedef: http://basket-service:3002/basket/{userId}
 app.use(
   "/api/basket",
   createProxyMiddleware({
     target: "http://basket-service:3002",
     changeOrigin: true,
+    pathRewrite: (path, req) => {
+      // Express middleware path'i kesiyor
+      // "/" gelirse "/basket", "/{userId}" gelirse "/basket/{userId}" olarak yönlendir
+      const newPath = path === '/' ? '/basket' : '/basket' + path;
+      console.log(`[PROXY] ${req.method} /api/basket${path} -> ${newPath}`);
+      return newPath;
+    }
   })
 );
 

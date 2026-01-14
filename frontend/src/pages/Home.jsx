@@ -24,13 +24,19 @@ export default function Home() {
     setLoading(false)
   }
 
-  const handleAddToBasket = async (productId) => {
-    const { available } = await inventoryApi.check(productId)
-    if (!available) {
-      alert('Sorry, this product is out of stock')
-      return
+  // product: full product object including id, name, price, etc.
+  const handleAddToBasket = async (product) => {
+    try {
+      const { available } = await inventoryApi.check(product.id)
+      if (!available) {
+        alert('Sorry, this product is out of stock')
+        return
+      }
+      await addItem(product)
+    } catch (error) {
+      console.error('Failed to add to basket:', error)
+      alert('Failed to add product to basket')
     }
-    await addItem(productId)
   }
 
   return (

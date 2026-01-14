@@ -15,8 +15,8 @@ export default function Basket() {
     fetchBasket()
   }, [])
 
-  const handleRemove = async (productId) => {
-    await removeItem(productId)
+  const handleRemove = async (itemId) => {
+    await removeItem(itemId)
   }
 
   const handleCheckout = async () => {
@@ -32,12 +32,10 @@ export default function Basket() {
     const orderPayload = {
       userId: parseInt(userId), 
       items: items.map(item => ({
-        productId: item.product?.id || item.productId,
+        productId: item.productId,
         quantity: item.quantity,
-        //  Product içinden unit price gelmeli.
-        unitPrice: parseFloat(item.product?.price || 0) 
+        unitPrice: parseFloat(item.price || 0) 
       })),
-      //  Sabit bir adres gönderiyoruz.
       shippingAddress: {
         city: "Istanbul",
         street: "Örnek Cadde No:1",
@@ -49,13 +47,9 @@ export default function Basket() {
     }
 
     try {
-      // orderApi.create fonksiyonunu çağırıyoruz
-      // AuthContext kısmında token olmadığı için ikinci parametre null gidiyor.
-      // Backend'de SKIP_AUTH=true olduğu için sorun olmaması lazım.
       const data = await orderApi.create(orderPayload, null)
       
       if (data?.success) {
-        // Başarılıysa sepeti temizle
         clearBasket()
         alert('Sipariş başarıyla alındı! Sipariş No: ' + (data.order?.id || data.orderId))
         navigate('/') 
@@ -68,7 +62,8 @@ export default function Basket() {
     }
   }
 
-  const total = items.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
+  // Backend'den gelen format: { id, productId, productName, price, quantity }
+  const total = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * item.quantity, 0)
 
   return (
     <div className="flex flex-col min-h-screen bg-[#112117]">
@@ -92,19 +87,25 @@ export default function Basket() {
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex-1 space-y-4">
               {items.map(item => (
-                <div key={item.productId} className="bg-[#1c2620] rounded-xl p-4 flex gap-4">
-                  <img
-                    src={item.product?.image}
-                    alt={item.product?.title}
-                    className="w-24 h-24 object-cover rounded-lg"
-                  />
+                <div key={item.id} className="bg-[#1c2620] rounded-xl p-4 flex gap-4">
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.productName}
+                      className="w-24 h-24 object-cover rounded-lg bg-[#253028]"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 bg-[#253028] rounded-lg flex items-center justify-center">
+                      <span className="material-symbols-outlined text-3xl text-[#36e27b]">shopping_bag</span>
+                    </div>
+                  )}
                   <div className="flex-1">
-                    <h3 className="text-white font-bold">{item.product?.title}</h3>
+                    <h3 className="text-white font-bold">{item.productName}</h3>
                     <p className="text-[#9eb7a8] text-sm">Qty: {item.quantity}</p>
-                    <p className="text-[#36e27b] font-bold mt-1">${item.product?.price}</p>
+                    <p className="text-[#36e27b] font-bold mt-1">${parseFloat(item.price).toFixed(2)}</p>
                   </div>
                   <button
-                    onClick={() => handleRemove(item.productId)}
+                    onClick={() => handleRemove(item.id)}
                     className="text-red-400 hover:text-red-300 transition-colors"
                   >
                     <span className="material-symbols-outlined">delete</span>
@@ -119,7 +120,7 @@ export default function Basket() {
                 <div className="space-y-2 mb-6">
                   <div className="flex justify-between text-[#9eb7a8]">
                     <span>Subtotal</span>
-                    <span>${total}</span>
+                    <span>${total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-[#9eb7a8]">
                     <span>Shipping</span>
@@ -128,7 +129,7 @@ export default function Basket() {
                   <hr className="border-[#29382f]" />
                   <div className="flex justify-between text-white font-bold text-lg">
                     <span>Total</span>
-                    <span>${total}</span>
+                    <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
                 <button

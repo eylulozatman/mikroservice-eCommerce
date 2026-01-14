@@ -57,20 +57,25 @@ export const inventoryApi = {
 }
 
 // Basket API - /api/basket -> basket-service:3002
+// Controller endpoints: GET /{userId}, POST /{userId}/add, DELETE /{userId}/item/{itemId}, DELETE /{userId}/clear
 export const basketApi = {
-  list: (userId) => request('/api/basket/list', {
+  // GET /api/basket/{userId} - Kullanıcının sepetini getir
+  get: (userId) => request(`/api/basket/${userId}`),
+
+  // POST /api/basket/{userId}/add - Sepete ürün ekle
+  add: (userId, productId, productName, price, imageUrl, quantity = 1) => request(`/api/basket/${userId}/add`, {
     method: 'POST',
-    body: JSON.stringify({ userId })
+    body: JSON.stringify({ productId, productName, price, imageUrl, quantity })
   }),
 
-  add: (userId, productId, quantity = 1) => request('/api/basket/add', {
-    method: 'POST',
-    body: JSON.stringify({ userId, productId, quantity })
+  // DELETE /api/basket/{userId}/item/{itemId} - Sepetten ürün çıkar
+  remove: (userId, itemId) => request(`/api/basket/${userId}/item/${itemId}`, {
+    method: 'DELETE'
   }),
 
-  remove: (userId, productId) => request('/api/basket/remove', {
-    method: 'POST',
-    body: JSON.stringify({ userId, productId })
+  // DELETE /api/basket/{userId}/clear - Sepeti temizle
+  clear: (userId) => request(`/api/basket/${userId}/clear`, {
+    method: 'DELETE'
   })
 }
 

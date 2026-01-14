@@ -5,7 +5,12 @@ export default function ProductCard({ product, onAddToBasket }) {
 
   const handleAdd = async () => {
     setLoading(true)
-    await onAddToBasket(product.id)
+    try {
+      // Pass full product object instead of just id
+      await onAddToBasket(product)
+    } catch (error) {
+      console.error('Add to basket error:', error)
+    }
     setLoading(false)
   }
 
