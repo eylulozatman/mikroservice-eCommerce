@@ -82,13 +82,18 @@ app.use(
 );
 
 // 5. Order Service (Port 3004)
+// İstek: http://localhost:8000/api/orders -> http://order-service:3004/
 app.use(
   "/api/orders",
   createProxyMiddleware({
     target: "http://order-service:3004",
     changeOrigin: true,
-    pathRewrite: {
-      '^/api/orders': '',
+    pathRewrite: (path, req) => {
+      // /api/orders -> /
+      // /api/orders/user/2 -> /user/2
+      const newPath = path === '/' ? '/' : path;
+      console.log(`[PROXY] ${req.method} /api/orders${path} -> ${newPath}`);
+      return newPath;
     },
   })
 
