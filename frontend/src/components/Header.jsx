@@ -17,10 +17,11 @@ export default function Header() {
         <div className="flex flex-1 justify-end gap-6 items-center">
           <nav className="hidden md:flex items-center gap-8">
             <Link to="/" className="text-[#36e27b] text-sm font-bold">Home</Link>
+            <Link to="/my-orders" className="text-[#9eb7a8] hover:text-[#36e27b] text-sm font-bold transition-colors">My Orders</Link>
           </nav>
 
-          <Link 
-            to="/basket" 
+          <Link
+            to="/basket"
             className="relative flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-colors group"
           >
             <span className="material-symbols-outlined text-white group-hover:text-[#36e27b] transition-colors">
