@@ -108,8 +108,8 @@ class SagaOrchestrator {
                             productId: item.productId,
                             productName: productInfo.name || `Product ${item.productId}`,
                             quantity: item.quantity,
-                            unitPrice: productInfo.price || item.unitPrice || 0,
-                            totalPrice: (productInfo.price || item.unitPrice || 0) * item.quantity
+                            unitPrice: productInfo.price || item.unitPrice || item.price || 0,
+                            totalPrice: (productInfo.price || item.unitPrice || item.price || 0) * item.quantity
                         }, { transaction });
                     })
                 );
@@ -219,7 +219,7 @@ class SagaOrchestrator {
                     productDetails.push({
                         productId: item.productId,
                         name: stockInfo.productName,
-                        price: stockInfo.price,
+                        price: stockInfo.price || item.unitPrice || item.price,
                         availableQuantity: stockInfo.quantity
                     });
                 }
@@ -237,7 +237,7 @@ class SagaOrchestrator {
                     productDetails.push({
                         productId: item.productId,
                         name: `Product ${item.productId}`,
-                        price: item.unitPrice || 99.99,
+                        price: item.unitPrice || item.price || 99.99,
                         availableQuantity: 100
                     });
                 } else {
@@ -265,7 +265,7 @@ class SagaOrchestrator {
     calculateTotal(items, productDetails = []) {
         return items.reduce((sum, item) => {
             const productInfo = productDetails.find(p => p.productId === item.productId);
-            const price = productInfo?.price || item.unitPrice || 0;
+            const price = productInfo?.price || item.unitPrice || item.price || 0;
             return sum + (price * item.quantity);
         }, 0);
     }
