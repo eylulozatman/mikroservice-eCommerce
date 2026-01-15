@@ -79,6 +79,14 @@ export default function Basket() {
       const data = await orderApi.create(orderPayload, null)
       
       if (data?.success) {
+        try {
+            await Promise.all(items.map(item => 
+                inventoryApi.decrease(item.productId || item.product.id, item.quantity)
+            ));
+            console.log("Stoklar başarıyla güncellendi.");
+        } catch (stockErr) {
+            console.error("Sipariş alındı ancak stok düşülürken hata oluştu:", stockErr);
+        }
         clearBasket()
         alert('Sipariş başarıyla alındı! Sipariş No: ' + (data.order?.id || data.orderId))
         navigate('/') 

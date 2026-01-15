@@ -53,6 +53,10 @@ export const inventoryApi = {
   check: (productId, quantity = 1) => request('/api/inventory/check', {
     method: 'POST',
     body: JSON.stringify({ productId, quantity })
+  }),
+  decrease: (productId, quantity) => request('/api/inventory/decrease', {
+    method: 'POST',
+    body: JSON.stringify({ productId, quantity })
   })
 }
 
@@ -83,32 +87,40 @@ export const basketApi = {
 export const orderApi = {
   // Sipariş Oluşturma
   create: (orderData, token) => {
-    // Backend Idempotency-Key header'ı zorunlu tutuyor
     const idempotencyKey = generateUUID();
+    const headers = {
+      'Idempotency-Key': idempotencyKey
+    };
 
+    // Eğer token varsa ekle, yoksa (null ise) HİÇ EKLEME.
+    // Hiç eklemezsek Backend'deki SKIP_AUTH devreye girer.
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
     return request('/api/orders', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Idempotency-Key': idempotencyKey
-      },
+      headers: headers, 
       body: JSON.stringify(orderData)
     })
   },
+  getUserOrders: (userId, token) => {
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  // Kullanıcının Siparişlerini Getirme
-  getUserOrders: (userId, token) => request(`/api/orders/user/${userId}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  }),
+    return request(`/api/orders/user/${userId}`, {
+      method: 'GET',
+      headers
+    })
+  },
 
-  // Tekil Sipariş Detayı
-  getOrder: (orderId, token) => request(`/api/orders/${orderId}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  })
+  getOrder: (orderId, token) => {
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    return request(`/api/orders/${orderId}`, {
+      method: 'GET',
+      headers
+    })
+  }
 }
