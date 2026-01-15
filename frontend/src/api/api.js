@@ -9,7 +9,7 @@ function generateUUID() {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
   }
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     const r = Math.random() * 16 | 0;
     const v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
@@ -97,10 +97,10 @@ export const orderApi = {
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     return request('/api/orders', {
       method: 'POST',
-      headers: headers, 
+      headers: headers,
       body: JSON.stringify(orderData)
     })
   },
@@ -117,10 +117,21 @@ export const orderApi = {
   getOrder: (orderId, token) => {
     const headers = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    
+
     return request(`/api/orders/${orderId}`, {
       method: 'GET',
       headers
     })
+  },
+
+  // Mock Payment Endpoint
+  pay: (orderId, token) => {
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    return request(`/api/orders/${orderId}/pay`, {
+      method: 'POST',
+      headers
+    });
   }
 }

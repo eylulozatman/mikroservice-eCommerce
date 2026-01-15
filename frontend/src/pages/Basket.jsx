@@ -27,11 +27,11 @@ export default function Basket() {
     }
 
     setCheckoutLoading(true)
-    
+
     try {
       // 1. Önce tüm ürünler için inventory check yap
       const outOfStockItems = []
-      
+
       for (const item of items) {
         try {
           const result = await inventoryApi.check(item.productId, item.quantity)
@@ -50,7 +50,7 @@ export default function Basket() {
 
       // 2. Stokta olmayan ürün varsa hata göster
       if (outOfStockItems.length > 0) {
-        const message = outOfStockItems.map(item => 
+        const message = outOfStockItems.map(item =>
           `${item.name}: ${item.requested} adet istendi, ${item.available} adet mevcut`
         ).join('\n')
         alert('Yetersiz stok:\n' + message)
@@ -60,11 +60,11 @@ export default function Basket() {
 
       // 3. Tüm stoklar uygunsa sipariş oluştur
       const orderPayload = {
-        userId: parseInt(userId), 
+        userId: parseInt(userId),
         items: items.map(item => ({
           productId: item.productId,
           quantity: item.quantity,
-          unitPrice: parseFloat(item.price || 0) 
+          unitPrice: parseFloat(item.price || 0)
         })),
         shippingAddress: {
           city: "Istanbul",
@@ -76,20 +76,27 @@ export default function Basket() {
         }
       }
 
+      // A. Siparişi Oluştur
       const data = await orderApi.create(orderPayload, null)
-      
+
       if (data?.success) {
+        const orderId = data.order?.id || data.orderId;
+        console.log(`Order Created: ${orderId}. Initiating Mock Payment...`);
+
         try {
-            await Promise.all(items.map(item => 
-                inventoryApi.decrease(item.productId || item.product.id, item.quantity)
-            ));
-            console.log("Stoklar başarıyla güncellendi.");
-        } catch (stockErr) {
-            console.error("Sipariş alındı ancak stok düşülürken hata oluştu:", stockErr);
+          // B. Ödemeyi Tetikle
+          const paymentResult = await orderApi.pay(orderId, null);
+
+          if (paymentResult?.success) {
+            console.log("Payment Successful!");
+            clearBasket()
+            alert(`Sipariş ve Ödeme Başarılı!\nSipariş No: ${orderId}`);
+            navigate('/')
+          }
+        } catch (paymentErr) {
+          console.error("Payment Failed:", paymentErr);
+          alert(`Ödeme Başarısız Oldu!\n\nSipariş iptal edildi ve stoklar geri yüklendi.`);
         }
-        clearBasket()
-        alert('Sipariş başarıyla alındı! Sipariş No: ' + (data.order?.id || data.orderId))
-        navigate('/') 
       }
     } catch (err) {
       console.error("Checkout hatası:", err)
@@ -105,7 +112,7 @@ export default function Basket() {
   return (
     <div className="flex flex-col min-h-screen bg-[#112117]">
       <Header />
-      
+
       <main className="flex-grow w-full max-w-[1440px] mx-auto px-4 md:px-10 py-8">
         <h1 className="text-4xl font-black tracking-tighter text-white mb-8">Your Basket</h1>
 
