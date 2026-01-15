@@ -69,4 +69,21 @@ public class InventoryService {
 
         return new InventoryResponse(updated.getProductId(), updated.getStock());
     }
+
+    /**
+     * Stok artırır - sipariş iptal/fail durumunda kullanılır (Saga compensation)
+     */
+    @Transactional
+    public InventoryResponse increaseStock(Long productId, Integer quantity) {
+        int updatedRows = inventoryRepository.increaseStock(productId, quantity);
+
+        if (updatedRows == 0) {
+            throw new NotFoundException("Inventory not found for product: " + productId);
+        }
+
+        Inventory updated = inventoryRepository.findByProductId(productId)
+                .orElseThrow(() -> new NotFoundException("Inventory not found for product: " + productId));
+
+        return new InventoryResponse(updated.getProductId(), updated.getStock());
+    }
 }

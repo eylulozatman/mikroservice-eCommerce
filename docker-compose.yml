@@ -229,12 +229,18 @@ services:
     depends_on:
       inventory-db:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       DB_HOST: inventory-db
       DB_PORT: 5432
       DB_NAME: inventory_db
       DB_USER: postgres
       DB_PASSWORD: postgres
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
     ports:
       - "3003:3003"
     networks:
