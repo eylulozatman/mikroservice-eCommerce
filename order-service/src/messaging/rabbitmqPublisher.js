@@ -262,8 +262,19 @@ class RabbitMQPublisher {
      * Publish order.failed event
      */
     async publishOrderFailed(order, reason, correlationId) {
+        // Get items from order if available
+        const items = order.items || [];
+
         return this.publishWithRetry('order.events', 'order.failed', {
             eventType: 'order.failed',
+            order: {
+                id: order.id,
+                userId: order.userId,
+                items: items.map(item => ({
+                    productId: item.productId,
+                    quantity: item.quantity
+                }))
+            },
             payload: {
                 orderId: order.id,
                 userId: order.userId,

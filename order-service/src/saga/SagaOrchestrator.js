@@ -130,7 +130,17 @@ class SagaOrchestrator {
                 sagaLogger.info('Database transaction committed', { orderId: order.id });
                 transaction = null; // Mark transaction as complete
 
-                // Step 8: Update order status (stock reserved was validated)
+                // Step 8: Decrease stock (reserve inventory)
+                for (const item of items) {
+                    try {
+                        await inventoryClient.decreaseStock(item.productId, item.quantity);
+                        sagaLogger.info('Stock decreased', { productId: item.productId, quantity: item.quantity });
+                    } catch (stockError) {
+                        sagaLogger.warn('Failed to decrease stock', { productId: item.productId, error: stockError.message });
+                    }
+                }
+
+                // Step 9: Update order status (stock reserved)
                 await order.update({ status: ORDER_STATUS.STOCK_RESERVED });
                 await sagaState.completeStep(SAGA_STEPS.RESERVE_STOCK);
 

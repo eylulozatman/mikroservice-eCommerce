@@ -247,6 +247,76 @@ class OrderController {
             next(error);
         }
     }
+
+    /**
+     * POST /api/orders/:orderId/pay
+     * Mock payment endpoint - fails 30% of the time for testing saga rollback
+     */
+    async processPayment(req, res, next) {
+        const controllerLogger = logger.child({
+            correlationId: req.correlationId,
+            action: 'processPayment'
+        });
+
+        try {
+            const { orderId } = req.params;
+
+            const order = await Order.findByPk(orderId, {
+                include: [{ model: OrderItem, as: 'items' }]
+            });
+
+            if (!order) {
+                throw new NotFoundError('Order', orderId);
+            }
+
+            if (order.status !== ORDER_STATUS.PAYMENT_PENDING) {
+                throw new ValidationError(`Order is not awaiting payment. Current status: ${order.status}`);
+            }
+
+            controllerLogger.info('Processing payment', {
+                orderId,
+                amount: order.totalAmount
+            });
+
+            // Mock payment: 30% failure rate
+            const paymentFails = Math.random() < 0.30;
+
+            if (paymentFails) {
+                controllerLogger.warn('Payment failed (mock)', { orderId });
+
+                // Trigger saga compensation
+                const sagaState = await SagaState.findOne({ where: { orderId } });
+                await sagaOrchestrator.compensate(order, sagaState, new Error('Payment declined'), controllerLogger);
+
+                return res.status(402).json({
+                    success: false,
+                    error: 'PAYMENT_FAILED',
+                    message: 'Payment was declined (mock failure for testing)',
+                    order: {
+                        id: order.id,
+                        status: order.status
+                    },
+                    correlationId: req.correlationId
+                });
+            }
+
+            // Payment success
+            await order.updateStatus(ORDER_STATUS.PAID);
+            await order.updateStatus(ORDER_STATUS.CONFIRMED);
+
+            controllerLogger.info('Payment successful', { orderId });
+
+            return res.status(200).json({
+                success: true,
+                message: 'Payment processed successfully',
+                order: formatOrderResponse(await order.reload({ include: [{ model: OrderItem, as: 'items' }] })),
+                correlationId: req.correlationId
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 // Export singleton instance

@@ -19,3 +19,7 @@ screen.png
 # OS
 .DS_Store
 Thumbs.db
+
+# Demo Saga Script
+demo_saga.sh
+

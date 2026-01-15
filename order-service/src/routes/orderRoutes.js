@@ -76,4 +76,15 @@ router.delete('/:orderId',
     (req, res, next) => orderController.cancelOrder(req, res, next)
 );
 
+/**
+ * @route   POST /:orderId/pay
+ * @desc    Process payment for order (mock - fails 30% for testing rollback)
+ * @access  Protected - order owner
+ */
+router.post('/:orderId/pay',
+    authenticate,
+    getOrderValidation,
+    (req, res, next) => orderController.processPayment(req, res, next)
+);
+
 module.exports = router;
