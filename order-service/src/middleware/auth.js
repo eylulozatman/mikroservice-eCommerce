@@ -13,13 +13,15 @@ const authenticate = (req, res, next) => {
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            // In development, allow requests without auth but log warning
-            if (process.env.NODE_ENV === 'development' && process.env.SKIP_AUTH === 'true') {
-                logger.warn('Skipping authentication in development mode', {
+            // Allow requests without auth if SKIP_AUTH is explicitly set
+            if (process.env.SKIP_AUTH === 'true') {
+                logger.warn('Skipping authentication (SKIP_AUTH=true)', {
                     path: req.path,
                     method: req.method
                 });
-                req.user = { id: 1, role: 'user' }; // Default dev user
+                // Get userId from body, params, or query - in that order
+                const userId = req.body?.userId || req.params?.userId || req.query?.userId || 1;
+                req.user = { id: parseInt(userId), role: 'user' };
                 return next();
             }
             throw new UnauthorizedError('No authentication token provided');
